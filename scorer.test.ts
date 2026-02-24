@@ -253,4 +253,9 @@ describe("index.html", () => {
   test("shows regulatory friction section", () => {
     expect(html).toContain("Regulatory requirements");
   });
+
+  test("has Umami analytics tracking script", () => {
+    expect(html).toContain("waxanalytics.exe.xyz/script.js");
+    expect(html).toContain("data-website-id=");
+  });
 });
