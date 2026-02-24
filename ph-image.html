@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #0a0a0f; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
+  .card { background: #14141f; border-radius: 20px; padding: 48px 56px; width: 580px; border: 1px solid #2a2a3e; }
+  .header { text-align: center; margin-bottom: 36px; }
+  .grade { font-size: 96px; font-weight: 800; color: #3b82f6; line-height: 1; }
+  .score-text { font-size: 22px; color: #8888aa; margin-top: 4px; }
+  .url { font-size: 15px; color: #6668aa; margin-top: 8px; letter-spacing: 0.5px; }
+  .categories { display: flex; flex-direction: column; gap: 20px; }
+  .cat-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .cat-name { font-size: 14px; font-weight: 600; color: #e0e0f0; letter-spacing: 0.5px; }
+  .cat-score { font-size: 14px; font-weight: 700; color: #8888aa; }
+  .bar { height: 8px; background: #1e1e2e; border-radius: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 4px; }
+  .green { background: #22c55e; }
+  .blue { background: #3b82f6; }
+  .yellow { background: #eab308; }
+  .branding { text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #1e1e2e; }
+  .brand-text { font-size: 13px; color: #5558aa; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <div class="grade">B</div>
+    <div class="score-text">33 / 40</div>
+    <div class="url">datadog.com</div>
+  </div>
+  <div class="categories">
+    <div>
+      <div class="cat-row">
+        <span class="cat-name">🔍 DISCOVERY</span>
+        <span class="cat-score">6 / 10</span>
+      </div>
+      <div class="bar"><div class="bar-fill blue" style="width:60%"></div></div>
+    </div>
+    <div>
+      <div class="cat-row">
+        <span class="cat-name">💳 PURCHASE</span>
+        <span class="cat-score">8 / 10</span>
+      </div>
+      <div class="bar"><div class="bar-fill green" style="width:80%"></div></div>
+    </div>
+    <div>
+      <div class="cat-row">
+        <span class="cat-name">🔌 INTEGRATION</span>
+        <span class="cat-score">10 / 10</span>
+      </div>
+      <div class="bar"><div class="bar-fill green" style="width:100%"></div></div>
+    </div>
+    <div>
+      <div class="cat-row">
+        <span class="cat-name">🛡️ TRUST</span>
+        <span class="cat-score">9 / 10</span>
+      </div>
+      <div class="bar"><div class="bar-fill green" style="width:90%"></div></div>
+    </div>
+  </div>
+  <div class="branding">
+    <div class="brand-text">AGENT READINESS SCORER</div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{
+  "name": "agent-readiness-scorer",
+  "version": "1.0.0",
+  "description": "Score how ready a product/service is for AI agent commerce",
+  "scripts": {
+    "start": "bun run server.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}

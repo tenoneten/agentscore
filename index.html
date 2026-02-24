@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Readiness Scorer — How Ready Is Your Product for AI Agents?</title>
+<meta name="description" content="Free tool to score how ready your product is for AI agent commerce. Check discovery, purchase, integration, and trust signals across 40 points.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+<style>
+  :root { --bg: #0a0a0f; --surface: #14141f; --surface2: #1e1e2e; --border: #2a2a3e; --text: #e0e0f0; --muted: #8888aa; --accent: #6c63ff; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.6; }
+  .container { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* Header */
+  header { text-align: center; margin-bottom: 2.5rem; }
+  header h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: .4rem; }
+  header h1 span { color: var(--accent); }
+  header p { color: var(--muted); font-size: .95rem; }
+
+  /* Input */
+  .input-group { display: flex; gap: .5rem; margin-bottom: 2rem; }
+  .input-group input { flex: 1; padding: .85rem 1rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-size: 1rem; outline: none; transition: border-color .2s; }
+  .input-group input:focus { border-color: var(--accent); }
+  .input-group button { padding: .85rem 1.8rem; border-radius: 10px; border: none; background: var(--accent); color: #fff; font-size: 1rem; font-weight: 600; cursor: pointer; white-space: nowrap; transition: opacity .2s; }
+  .input-group button:hover { opacity: .85; }
+  .input-group button:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Status */
+  #status { text-align: center; color: var(--muted); margin-bottom: 1rem; font-size: .9rem; }
+  #error { text-align: center; color: #ff6b6b; margin-bottom: 1rem; }
+
+  /* Results */
+  .result { display: none; }
+  .result.visible { display: block; }
+  .grade-card { text-align: center; background: var(--surface); border-radius: 16px; padding: 2rem; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+  .grade-letter { font-size: 5rem; font-weight: 800; line-height: 1; margin-bottom: .3rem; }
+  .grade-A { color: #22c55e; } .grade-B { color: #3b82f6; } .grade-C { color: #eab308; } .grade-D { color: #f97316; } .grade-F { color: #ef4444; }
+  .grade-score { font-size: 1.3rem; color: var(--muted); }
+  .grade-url { font-size: .85rem; color: var(--muted); margin-top: .5rem; word-break: break-all; }
+  .share-row { text-align: center; margin-bottom: 1.5rem; }
+  .share-row button { padding: .5rem 1.2rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font-size: .85rem; }
+  .category { background: var(--surface); border-radius: 12px; padding: 1.2rem 1.4rem; margin-bottom: 1rem; border: 1px solid var(--border); }
+  .cat-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .6rem; }
+  .cat-name { font-weight: 700; font-size: 1.05rem; }
+  .cat-desc { color: var(--muted); font-size: .8rem; }
+  .cat-score { font-size: 1.1rem; font-weight: 700; }
+  .cat-bar { height: 6px; background: var(--surface2); border-radius: 3px; margin-bottom: .8rem; overflow: hidden; }
+  .cat-bar-fill { height: 100%; border-radius: 3px; transition: width .5s; }
+  .sub-item { padding: .4rem 0; border-bottom: 1px solid var(--border); font-size: .88rem; }
+  .sub-item:last-child { border-bottom: none; }
+  .sub-header { display: flex; justify-content: space-between; }
+  .sub-name { color: var(--text); }
+  .sub-score { color: var(--muted); font-weight: 600; }
+  .sub-findings { color: var(--muted); font-size: .8rem; padding-top: .2rem; }
+  .crawled { margin-top: 1.5rem; padding: 1rem; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); }
+  .crawled summary { color: var(--muted); font-size: .85rem; cursor: pointer; }
+  .crawled ul { margin-top: .5rem; padding-left: 1.2rem; font-size: .8rem; color: var(--muted); }
+
+  /* About section */
+  .about { margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border); }
+  .about h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; }
+  .about p { color: var(--muted); font-size: .92rem; margin-bottom: 1rem; }
+  .about-section { background: var(--surface); border-radius: 12px; margin-bottom: 1rem; border: 1px solid var(--border); overflow: hidden; }
+  .about-section summary { padding: 1rem 1.4rem; cursor: pointer; font-weight: 600; font-size: 1rem; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .about-section summary::-webkit-details-marker { display: none; }
+  .about-section summary::after { content: '▸'; color: var(--muted); transition: transform .2s; }
+  .about-section[open] summary::after { transform: rotate(90deg); }
+  .about-section .content { padding: 0 1.4rem 1.2rem; }
+  .about-section .content p { color: var(--muted); font-size: .88rem; margin-bottom: .6rem; }
+  .about-section .content ul { padding-left: 1.2rem; margin-bottom: .8rem; }
+  .about-section .content li { color: var(--muted); font-size: .85rem; margin-bottom: .3rem; }
+  .about-section .emoji-label { margin-right: .4rem; }
+
+  /* Footer */
+  footer { margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); text-align: center; }
+  footer p { color: var(--muted); font-size: .82rem; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { display: inline-block; width: 18px; height: 18px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; margin-right: .5rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🤖 Agent <span>Readiness</span> Scorer</h1>
+    <p>How ready is this product for AI agent commerce?</p>
+  </header>
+
+  <div class="input-group">
+    <input type="text" id="urlInput" placeholder="Enter a URL (e.g. stripe.com)" autofocus>
+    <button id="scoreBtn" onclick="doScore()">Score</button>
+  </div>
+  <div id="status"></div>
+  <div id="error"></div>
+  <div class="result" id="result"></div>
+
+  <!-- About -->
+  <div class="about">
+    <h2>What is this?</h2>
+    <p>When AI agents start buying things, which businesses will they be able to work with? That turns out to be a surprisingly hard question to answer by just looking at a website.</p>
+    <p>Some things are obvious. If a product has a public API with documentation, that's a good sign. If the only way to buy is "contact sales," that's a bad sign. But most companies fall somewhere in the messy middle — they have an API but no machine-readable pricing, or they offer self-serve signup but gate it behind a CAPTCHA.</p>
+    <p>We wanted a way to be more systematic about it. Not because a score can capture everything, but because the exercise of defining what "agent-ready" means forces you to be specific about what actually matters.</p>
+
+    <h2 style="margin-top: 2rem;">The Rubric</h2>
+    <p>We score four categories. Each is worth 10 points, for a total of 40.</p>
+
+    <details class="about-section">
+      <summary><span><span class="emoji-label">🔍</span> Discovery</span></summary>
+      <div class="content">
+        <p>Can an agent find this product and understand what it does?</p>
+        <ul>
+          <li>Public API documentation</li>
+          <li>OpenAPI / machine-readable specs</li>
+          <li>Machine-readable pricing</li>
+          <li>Listings in directories and marketplaces</li>
+        </ul>
+        <p>If an agent can't figure out what you sell and what it costs without parsing marketing copy, you're invisible to the machine economy.</p>
+      </div>
+    </details>
+
+    <details class="about-section">
+      <summary><span><span class="emoji-label">💳</span> Purchase</span></summary>
+      <div class="content">
+        <p>Can an agent buy this without a human?</p>
+        <ul>
+          <li>Programmatic signup (no CAPTCHAs)</li>
+          <li>API-based billing</li>
+          <li>Free tier or self-serve trial</li>
+          <li>No mandatory sales calls</li>
+        </ul>
+        <p>Every "contact us for pricing" page is a door that's closed to agents.</p>
+      </div>
+    </details>
+
+    <details class="about-section">
+      <summary><span><span class="emoji-label">🔌</span> Integration</span></summary>
+      <div class="content">
+        <p>Can an agent actually use this?</p>
+        <ul>
+          <li>SDKs and client libraries</li>
+          <li>Webhooks and event streams</li>
+          <li>Sandbox / test environments</li>
+          <li>Standard authentication (OAuth, API keys)</li>
+        </ul>
+        <p>The difference between a product an agent can use and one it can't often comes down to whether there's a test environment.</p>
+      </div>
+    </details>
+
+    <details class="about-section">
+      <summary><span><span class="emoji-label">🛡️</span> Trust</span></summary>
+      <div class="content">
+        <p>Can an agent verify this is reliable?</p>
+        <ul>
+          <li>Published SLAs</li>
+          <li>Public status page</li>
+          <li>Spend limits and usage controls</li>
+          <li>Security documentation</li>
+        </ul>
+        <p>When agents are spending money autonomously, they need programmatic ways to assess risk — not a logo wall of enterprise customers.</p>
+      </div>
+    </details>
+
+    <h2 style="margin-top: 2rem;">Is this score definitive?</h2>
+    <p>No. A 40-point automated crawl is a blunt instrument — more conversation starter than definitive assessment. But even a rough score surfaces patterns that are hard to see otherwise.</p>
+    <p>We're putting this out there not because we think the scoring is perfect, but because we think the conversation matters. What should agent-readiness mean? Are we weighting the right things?</p>
+    <p>Tell us what we got wrong — on <a href="https://x.com/dwaxd" target="_blank">X</a> or in the <a href="https://waxmand.substack.com/p/a-simple-test-can-an-ai-agent-use" target="_blank">Substack comments</a>.</p>
+  </div>
+
+  <footer>
+    <p>Built by <a href="https://tenoneten.com" target="_blank">TenOneTen Ventures</a> — an early-stage B2B venture fund investing in the agent economy.</p>
+  </footer>
+</div>
+
+<script>
+const urlInput = document.getElementById('urlInput');
+const scoreBtn = document.getElementById('scoreBtn');
+const statusEl = document.getElementById('status');
+const errorEl = document.getElementById('error');
+const resultEl = document.getElementById('result');
+
+const params = new URLSearchParams(location.search);
+if (params.get('id')) loadReport(params.get('id'));
+
+urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') doScore(); });
+
+async function doScore() {
+  const url = urlInput.value.trim();
+  if (!url) return;
+  scoreBtn.disabled = true;
+  errorEl.textContent = '';
+  resultEl.classList.remove('visible');
+  statusEl.innerHTML = '<span class="spinner"></span>Crawling & scoring… this takes 15-30 seconds';
+  try {
+    const resp = await fetch('/api/score', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    history.replaceState(null, '', '?id=' + data.id);
+    renderResult(data);
+  } catch (e) {
+    errorEl.textContent = e.message;
+    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } finally {
+    statusEl.textContent = '';
+    scoreBtn.disabled = false;
+  }
+}
+
+async function loadReport(id) {
+  statusEl.innerHTML = '<span class="spinner"></span>Loading report…';
+  try {
+    const resp = await fetch('/api/report/' + id);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    urlInput.value = data.url;
+    renderResult(data);
+  } catch (e) {
+    errorEl.textContent = e.message;
+  } finally { statusEl.textContent = ''; }
+}
+
+function barColor(score, max) {
+  const pct = score / max;
+  if (pct >= .8) return '#22c55e';
+  if (pct >= .6) return '#3b82f6';
+  if (pct >= .4) return '#eab308';
+  if (pct >= .2) return '#f97316';
+  return '#ef4444';
+}
+
+function renderResult(data) {
+  let html = `
+    <div class="grade-card">
+      <div class="grade-letter grade-${data.grade}">${data.grade}</div>
+      <div class="grade-score">${data.totalScore} / ${data.maxScore}</div>
+      <div class="grade-url">${data.url}</div>
+    </div>
+    <div class="share-row"><button onclick="copyShare()">📋 Copy Share Link</button></div>`;
+  if (data.frictionSummary) {
+    const fs = data.frictionSummary;
+    if (fs.voluntaryFriction.length || fs.regulatoryFriction.length) {
+      html += `<div class="category" style="border-left:3px solid #eab308">
+        <div class="cat-name">⚡ Friction Analysis</div>`;
+      if (fs.voluntaryFriction.length) {
+        html += `<div style="margin:.5rem 0"><span style="color:#ef4444;font-weight:600">Design choices (full penalty):</span><ul style="margin:.3rem 0 .3rem 1.2rem;color:var(--muted)">`;
+        for (const f of fs.voluntaryFriction) html += `<li>${f}</li>`;
+        html += `</ul></div>`;
+      }
+      if (fs.regulatoryFriction.length) {
+        html += `<div style="margin:.5rem 0"><span style="color:#f97316;font-weight:600">Regulatory requirements (half penalty):</span><ul style="margin:.3rem 0 .3rem 1.2rem;color:var(--muted)">`;
+        for (const f of fs.regulatoryFriction) html += `<li>${f}</li>`;
+        html += `</ul></div>`;
+      }
+      if (fs.agentReadyPending) {
+        html += `<div style="margin-top:.6rem;padding:.5rem .8rem;background:#1a1a2e;border-radius:8px;border:1px solid #3b82f6;font-size:.9rem">
+          🏷️ <strong>Agent Ready — Pending Identity Infrastructure</strong><br>
+          <span style="color:var(--muted)">Score would improve once agent identity/KYC solutions (e.g. Catena Labs) exist.</span></div>`;
+      }
+      html += `</div>`;
+    }
+  }
+  for (const cat of data.categories) {
+    const pct = (cat.score / cat.maxPoints * 100).toFixed(0);
+    const color = barColor(cat.score, cat.maxPoints);
+    html += `<div class="category">
+      <div class="cat-header"><div><div class="cat-name">${cat.name}</div><div class="cat-desc">${cat.description}</div></div><div class="cat-score" style="color:${color}">${cat.score}/${cat.maxPoints}</div></div>
+      <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+    for (const sub of cat.subScores) {
+      const badge = sub.frictionType === 'voluntary' ? ' <span style="color:#ef4444;font-size:.75rem;font-weight:600">VOLUNTARY</span>'
+        : sub.frictionType === 'regulatory' ? ' <span style="color:#f97316;font-size:.75rem;font-weight:600">REGULATORY</span>' : '';
+      html += `<div class="sub-item"><div class="sub-header"><span class="sub-name">${sub.name}${badge}</span><span class="sub-score">${sub.score}/${sub.maxPoints}</span></div>
+        <div class="sub-findings">${sub.findings.join(' · ')}</div></div>`;
+    }
+    html += `</div>`;
+  }
+  html += `<details class="crawled"><summary>Pages crawled (${data.crawledPages.length})</summary><ul>${data.crawledPages.map(p=>'<li>'+p+'</li>').join('')}</ul></details>`;
+  if (data.errors.length) html += `<div style="color:#f97316;margin-top:.5rem;font-size:.85rem">${data.errors.join('<br>')}</div>`;
+  resultEl.innerHTML = html;
+  resultEl.classList.add('visible');
+}
+
+function copyShare() {
+  navigator.clipboard.writeText(location.href);
+  const btn = document.querySelector('.share-row button');
+  btn.textContent = '✅ Copied!';
+  setTimeout(() => btn.textContent = '📋 Copy Share Link', 2000);
+}
+</script>
+</body>
+</html>
