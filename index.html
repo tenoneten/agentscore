@@ -243,20 +243,15 @@ function renderResult(data) {
     if (fs.voluntaryFriction.length || fs.regulatoryFriction.length) {
       html += `<div class="category" style="border-left:3px solid #eab308">
         <div class="cat-name">⚡ Friction Analysis</div>`;
-      if (fs.voluntaryFriction.length) {
-        html += `<div style="margin:.5rem 0"><span style="color:#ef4444;font-weight:600">Design choices (full penalty):</span><ul style="margin:.3rem 0 .3rem 1.2rem;color:var(--muted)">`;
-        for (const f of fs.voluntaryFriction) html += `<li>${f}</li>`;
-        html += `</ul></div>`;
-      }
       if (fs.regulatoryFriction.length) {
-        html += `<div style="margin:.5rem 0"><span style="color:#f97316;font-weight:600">Regulatory requirements (half penalty):</span><ul style="margin:.3rem 0 .3rem 1.2rem;color:var(--muted)">`;
+        html += `<div style="margin:.5rem 0"><span style="color:#f97316;font-weight:600">Regulatory requirements (reduced penalty):</span><ul style="margin:.3rem 0 .3rem 1.2rem;color:var(--muted)">`;
         for (const f of fs.regulatoryFriction) html += `<li>${f}</li>`;
         html += `</ul></div>`;
       }
       if (fs.agentReadyPending) {
         html += `<div style="margin-top:.6rem;padding:.5rem .8rem;background:#1a1a2e;border-radius:8px;border:1px solid #3b82f6;font-size:.9rem">
           🏷️ <strong>Agent Ready — Pending Identity Infrastructure</strong><br>
-          <span style="color:var(--muted)">Score would improve once agent identity/KYC solutions (e.g. Catena Labs) exist.</span></div>`;
+          <span style="color:var(--muted)">Score would improve once agent identity and verification solutions exist.</span></div>`;
       }
       html += `</div>`;
     }
@@ -268,8 +263,7 @@ function renderResult(data) {
       <div class="cat-header"><div><div class="cat-name">${cat.name}</div><div class="cat-desc">${cat.description}</div></div><div class="cat-score" style="color:${color}">${cat.score}/${cat.maxPoints}</div></div>
       <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%;background:${color}"></div></div>`;
     for (const sub of cat.subScores) {
-      const badge = sub.frictionType === 'voluntary' ? ' <span style="color:#ef4444;font-size:.75rem;font-weight:600">VOLUNTARY</span>'
-        : sub.frictionType === 'regulatory' ? ' <span style="color:#f97316;font-size:.75rem;font-weight:600">REGULATORY</span>' : '';
+      const badge = sub.frictionType === 'regulatory' ? ' <span style="color:#f97316;font-size:.75rem;font-weight:600">REGULATORY</span>' : '';
       html += `<div class="sub-item"><div class="sub-header"><span class="sub-name">${sub.name}${badge}</span><span class="sub-score">${sub.score}/${sub.maxPoints}</span></div>
         <div class="sub-findings">${sub.findings.join(' · ')}</div></div>`;
     }
