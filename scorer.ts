@@ -146,11 +146,18 @@ export async function scoreUrl(inputUrl: string): Promise<ScoringResult> {
   const crawledPages: string[] = [];
   const visited = new Set<string>();
 
-  // Phase 0: Build subdomain seeds (common dev/docs subdomains)
+  // Phase 0: Build subdomain seeds (common dev/docs subdomains, including nested)
   const baseDomain = baseUrl.hostname.replace(/^www\./, "");
   const SUBDOMAIN_PREFIXES = ["docs", "developer", "developers", "api", "status"];
+  const NESTED_SUBDOMAIN_PREFIXES = [
+    "docs.cloud", "docs.cdp", "docs.api", "docs.developer", "docs.dev",
+    "developer.docs", "api.docs", "cloud.docs",
+  ];
   const subdomainSeeds: string[] = [];
   for (const sub of SUBDOMAIN_PREFIXES) {
+    subdomainSeeds.push(`https://${sub}.${baseDomain}`);
+  }
+  for (const sub of NESTED_SUBDOMAIN_PREFIXES) {
     subdomainSeeds.push(`https://${sub}.${baseDomain}`);
   }
 
@@ -178,17 +185,24 @@ export async function scoreUrl(inputUrl: string): Promise<ScoringResult> {
   }
 
   // Phase 2: Discover relevant links from crawled pages
+  // Also discover ALL same-domain subdomain roots (even if path isn't "relevant")
   const discoveredUrls: string[] = [];
+  const discoveredSubdomainRoots = new Set<string>();
   for (const [, html] of pages) {
     const links = findLinks(html, origin);
     for (const link of links) {
       try {
         const parsed = new URL(link);
-        // Same domain (allow subdomains)
         const linkDomain = parsed.hostname.replace(/^www\./, "");
         if (!linkDomain.endsWith(baseDomain)) continue;
         const normalized = parsed.origin + parsed.pathname.replace(/\/$/, "");
         if (visited.has(normalized)) continue;
+        // If it's a different subdomain, always crawl the root
+        if (linkDomain !== baseDomain && !discoveredSubdomainRoots.has(parsed.origin)) {
+          discoveredSubdomainRoots.add(parsed.origin);
+          discoveredUrls.push(parsed.origin);
+          visited.add(parsed.origin);
+        }
         if (isRelevantUrl(normalized)) {
           discoveredUrls.push(normalized);
         }
